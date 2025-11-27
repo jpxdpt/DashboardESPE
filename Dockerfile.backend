@@ -14,8 +14,8 @@ RUN npm ci
 # Copiar código do servidor
 COPY server ./server/
 
-# Gerar Prisma Client
-RUN npx prisma generate
+# Gerar Prisma Client (usa DATABASE_URL dummy se não estiver definida)
+RUN DATABASE_URL=${DATABASE_URL:-postgresql://dummy:dummy@localhost:5432/dummy} npx prisma generate
 
 # Compilar TypeScript
 RUN npx tsc -p tsconfig.server.json
