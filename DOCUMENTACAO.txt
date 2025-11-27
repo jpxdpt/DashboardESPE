@@ -1,0 +1,247 @@
+================================================================================
+                    DASHBOARD ESCOLA - SISTEMA DE ALERTAS
+                           Documentação do Projeto
+================================================================================
+
+O QUE É ESTE PROJETO?
+--------------------------------------------------------------------------------
+Este é um sistema de comunicação para a escola que permite aos professores 
+avisarem a secretaria quando precisam de autorizar a saída de um aluno.
+
+Imagine que um professor está na sala de aula e precisa de enviar um aluno 
+para a secretaria. Em vez de telefonar ou enviar um aluno com um papel, 
+o professor carrega num botão no computador e a secretaria recebe 
+imediatamente um aviso no ecrã deles.
+
+COMO FUNCIONA?
+--------------------------------------------------------------------------------
+
+PARA OS PROFESSORES:
+1. O professor faz login no sistema com o seu email e palavra-passe
+2. Na sua página, vê um botão grande que diz "Enviar Alerta"
+3. Quando carrega no botão, aparece uma lista de salas
+4. O professor escolhe a sala onde está (por exemplo: "Sala A101")
+5. Confirma e o alerta é enviado
+6. Aparece uma mensagem a confirmar que foi enviado com sucesso
+
+PARA A SECRETARIA:
+1. A secretaria faz login no sistema
+2. Na sua página, vê todos os alertas que os professores enviaram
+3. Cada alerta mostra:
+   - O nome do professor que enviou
+   - A sala onde o professor está
+   - A data e hora do alerta
+4. Quando alguém da secretaria vai à sala, carrega no botão "Marcar como 
+   Resolvido"
+5. Todos os alertas ficam guardados para consulta posterior
+
+FUNCIONALIDADES DO SISTEMA
+--------------------------------------------------------------------------------
+
+1. CRIAR CONTA E FAZER LOGIN
+   - Qualquer pessoa pode criar uma conta
+   - Existem dois tipos de conta: Professor ou Secretaria
+   - Cada pessoa tem o seu próprio email e palavra-passe
+   - Após criar a conta, pode fazer login
+
+2. DASHBOARD DO PROFESSOR
+   - Página simples com um botão para enviar alertas
+   - Lista de salas para escolher
+   - Confirmação quando o alerta é enviado
+
+3. DASHBOARD DA SECRETARIA
+   - Vê todos os alertas em tempo real (aparecem automaticamente)
+   - Pode filtrar para ver apenas os pendentes ou todos
+   - Pode marcar alertas como resolvidos
+   - Vê o histórico completo de todos os alertas
+
+4. GESTÃO DE SALAS (apenas para secretaria)
+   - Adicionar novas salas ao sistema
+   - Editar nomes de salas existentes
+   - Eliminar salas que já não são usadas
+   - Ver lista de todas as salas
+
+5. GESTÃO DE UTILIZADORES (apenas para secretaria)
+   - Criar novas contas de professores ou secretaria
+   - Ver lista de todos os utilizadores do sistema
+   - Informações guardadas: nome, email, tipo de utilizador
+
+COMO É QUE OS AVISOS APARECEM EM TEMPO REAL?
+--------------------------------------------------------------------------------
+O sistema usa uma tecnologia chamada WebSockets que permite que quando um 
+professor envia um alerta, a secretaria o veja imediatamente no ecrã, sem 
+precisar de atualizar a página. É como uma conversa em tempo real.
+
+O QUE FICA GUARDADO?
+--------------------------------------------------------------------------------
+Tudo o que acontece no sistema fica guardado numa base de dados:
+- Todos os utilizadores (professores e secretaria)
+- Todas as salas da escola
+- Todos os alertas enviados (mesmo os já resolvidos)
+- Quem resolveu cada alerta e quando
+
+Isto permite consultar o histórico a qualquer momento.
+
+COMO INSTALAR E USAR
+--------------------------------------------------------------------------------
+
+PASSO 1: PREPARAR O AMBIENTE
+- Ter o Node.js instalado no computador
+- Ter uma conta na Neon (serviço de base de dados online) ou outra base 
+  de dados PostgreSQL
+
+PASSO 2: CONFIGURAR A BASE DE DADOS
+- Criar um ficheiro chamado .env na pasta do projeto
+- Colocar a ligação à base de dados fornecida pela Neon
+- Colocar uma palavra-chave secreta para segurança
+
+PASSO 3: PREPARAR A BASE DE DADOS
+- Executar comandos para criar as tabelas necessárias
+- (Opcional) Adicionar dados de exemplo (utilizadores e salas)
+
+PASSO 4: INICIAR O SISTEMA
+- Iniciar o servidor do sistema (backend)
+- Iniciar a interface web (frontend)
+- Aceder ao sistema no navegador
+
+COMO USAR O SISTEMA
+--------------------------------------------------------------------------------
+
+PRIMEIRA VEZ:
+1. Aceder ao sistema no navegador (geralmente http://localhost:5173)
+2. Clicar em "Criar conta"
+3. Preencher os dados e escolher o tipo de utilizador
+4. Fazer login com a conta criada
+
+PARA PROFESSORES:
+1. Fazer login
+2. Ver a página do professor
+3. Quando precisar de enviar um alerta:
+   - Clicar em "Enviar Alerta"
+   - Escolher a sala
+   - Confirmar
+
+PARA SECRETARIA:
+1. Fazer login
+2. Ver a página da secretaria com os alertas
+3. Quando receber um alerta:
+   - Ver as informações (professor e sala)
+   - Quando alguém for à sala, clicar em "Marcar como Resolvido"
+4. Para gerir salas:
+   - Clicar em "Gestão de Salas" no menu
+   - Adicionar, editar ou eliminar salas
+5. Para gerir utilizadores:
+   - Clicar em "Gestão de Utilizadores" no menu
+   - Criar novas contas
+
+ESTRUTURA DO SISTEMA
+--------------------------------------------------------------------------------
+
+O sistema tem duas partes principais:
+
+PARTE 1: INTERFACE WEB (o que se vê no navegador)
+- Páginas de login e registo
+- Dashboard do professor
+- Dashboard da secretaria
+- Páginas de gestão de salas e utilizadores
+
+PARTE 2: SERVIDOR (o que funciona em segundo plano)
+- Recebe os pedidos dos professores e secretaria
+- Guarda informação na base de dados
+- Envia avisos em tempo real
+- Verifica se as pessoas têm permissão para fazer certas ações
+
+INFORMAÇÕES GUARDADAS
+--------------------------------------------------------------------------------
+
+PARA CADA UTILIZADOR:
+- Nome completo
+- Email (usado para fazer login)
+- Palavra-passe (guardada de forma segura)
+- Número de funcionário (opcional)
+- Tipo: Professor ou Secretaria
+
+PARA CADA SALA:
+- Nome da sala (exemplo: "Sala A101", "Laboratório de Informática")
+
+PARA CADA ALERTA:
+- Quem enviou (nome do professor)
+- Qual a sala
+- Quando foi enviado
+- Se já foi resolvido
+- Quem resolveu e quando
+
+SEGURANÇA
+--------------------------------------------------------------------------------
+
+- As palavras-passe são guardadas de forma encriptada (não podem ser lidas)
+- Cada pessoa precisa de fazer login para aceder ao sistema
+- Professores só veem a sua própria página
+- Secretaria tem acesso a mais funcionalidades
+- As ligações são seguras
+
+VANTAGENS DO SISTEMA
+--------------------------------------------------------------------------------
+
+- Rápido: os alertas aparecem instantaneamente
+- Simples: fácil de usar para professores e secretaria
+- Organizado: tudo fica guardado e pode ser consultado
+- Eficiente: não precisa de telefonemas ou papéis
+- Histórico: pode ver todos os alertas anteriores
+
+REQUISITOS DO SISTEMA
+--------------------------------------------------------------------------------
+
+PARA EXECUTAR O SISTEMA:
+- Computador com Windows, Mac ou Linux
+- Node.js instalado (versão 18 ou superior)
+- Ligação à Internet (para a base de dados)
+- Navegador web moderno (Chrome, Firefox, Edge, etc.)
+
+PARA DESENVOLVIMENTO:
+- Editor de código (opcional, para fazer alterações)
+- Conta na Neon ou outra base de dados PostgreSQL
+
+NOTAS IMPORTANTES
+--------------------------------------------------------------------------------
+
+- O ficheiro .env contém informações sensíveis e não deve ser partilhado
+- Em produção, é importante usar palavras-chave seguras
+- O servidor precisa de estar sempre a correr para o sistema funcionar
+- Se o servidor parar, é necessário reiniciá-lo
+- Os alertas só aparecem em tempo real se ambos os servidores estiverem 
+  a funcionar
+
+RESOLUÇÃO DE PROBLEMAS
+--------------------------------------------------------------------------------
+
+SE O SISTEMA NÃO FUNCIONAR:
+
+1. Verificar se ambos os servidores estão a correr
+   - Frontend (interface web)
+   - Backend (servidor)
+
+2. Verificar a ligação à base de dados
+   - Ver se a ligação na Neon está ativa
+   - Verificar se o ficheiro .env está correto
+
+3. Verificar os logs
+   - Olhar para o terminal onde o servidor está a correr
+   - Ver se há mensagens de erro
+
+4. Limpar e reinstalar
+   - Parar tudo
+   - Eliminar a pasta node_modules
+   - Reinstalar as dependências
+
+CONTACTO E SUPORTE
+--------------------------------------------------------------------------------
+
+Para questões sobre o funcionamento do sistema, consulte:
+- Os logs do servidor no terminal
+- O console do navegador (F12)
+- A documentação técnica (se disponível)
+
+================================================================================
+                              Fim da Documentação
+================================================================================

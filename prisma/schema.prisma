@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  PROFESSOR
+  SECRETARIA
+}
+
+enum AlertStatus {
+  PENDING
+  RESOLVED
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  password      String
+  name          String
+  employeeNumber String?  @unique
+  role          UserRole
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  sentAlerts    Alert[]   @relation("ProfessorAlerts")
+  resolvedAlerts Alert[]  @relation("ResolvedBy")
+}
+
+model Room {
+  id        String   @id @default(uuid())
+  name      String
+  number    String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  alerts    Alert[]
+}
+
+model Alert {
+  id          String      @id @default(uuid())
+  userId      String
+  roomId      String
+  status      AlertStatus @default(PENDING)
+  createdAt   DateTime    @default(now())
+  resolvedAt  DateTime?
+  resolvedById String?
+  
+  professor   User       @relation("ProfessorAlerts", fields: [userId], references: [id])
+  room        Room       @relation(fields: [roomId], references: [id])
+  resolvedBy  User?      @relation("ResolvedBy", fields: [resolvedById], references: [id])
+  
+  @@index([status])
+  @@index([createdAt])
+}

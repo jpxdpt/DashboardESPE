@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  backend:
+    image: ghcr.io/SEU_USUARIO/SEU_REPO/backend:latest
+    container_name: dashboard-backend
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - VITE_API_URL=${VITE_API_URL:-http://localhost:3001}
+      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost}
+    networks:
+      - dashboard-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/api/alerts', (r) => {process.exit(r.statusCode === 401 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  dashboard-network:
+    external: true
+

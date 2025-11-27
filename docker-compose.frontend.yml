@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: ghcr.io/SEU_USUARIO/SEU_REPO/frontend:latest
+    container_name: dashboard-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    environment:
+      - NGINX_HOST=_
+      - NGINX_PORT=80
+    depends_on:
+      - backend
+    networks:
+      - dashboard-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  dashboard-network:
+    external: true
+

@@ -1,0 +1,78 @@
+name: Prisma Migrations
+
+on:
+  workflow_dispatch:
+    inputs:
+      migrate_command:
+        description: 'Comando de migração (deploy, dev, reset)'
+        required: true
+        default: 'deploy'
+        type: choice
+        options:
+          - deploy
+          - dev
+          - reset
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'prisma/schema.prisma'
+      - 'prisma/migrations/**'
+
+env:
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+jobs:
+  migrate:
+    name: Executar Migrações
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[migrate]')
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify DATABASE_URL
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "❌ DATABASE_URL não está configurado nos secrets do GitHub"
+            exit 1
+          fi
+          echo "✅ DATABASE_URL configurado"
+
+      - name: Generate Prisma Client
+        run: npm run prisma:generate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Run Prisma Migrate
+        run: |
+          if [ "${{ github.event.inputs.migrate_command }}" == "deploy" ] || [ "${{ github.event_name }}" == "push" ]; then
+            echo "Executando: prisma migrate deploy"
+            npx prisma migrate deploy
+          elif [ "${{ github.event.inputs.migrate_command }}" == "dev" ]; then
+            echo "Executando: prisma migrate dev"
+            npx prisma migrate dev
+          elif [ "${{ github.event.inputs.migrate_command }}" == "reset" ]; then
+            echo "⚠️ Executando: prisma migrate reset (isto vai apagar todos os dados!)"
+            echo "::warning::Esta ação vai apagar todos os dados da base de dados!"
+            npx prisma migrate reset --force
+          fi
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Generate Prisma Client (após migração)
+        run: npm run prisma:generate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+

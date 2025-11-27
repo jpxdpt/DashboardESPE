@@ -1,0 +1,48 @@
+# Dockerfile para o Backend
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copiar ficheiros de dependências
+COPY package*.json ./
+COPY prisma ./prisma/
+COPY tsconfig*.json ./
+
+# Instalar dependências
+RUN npm ci
+
+# Copiar código do servidor
+COPY server ./server/
+
+# Gerar Prisma Client
+RUN npx prisma generate
+
+# Compilar TypeScript
+RUN npx tsc -p tsconfig.server.json
+
+# Estágio de produção
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copiar package.json e instalar apenas dependências de produção
+COPY package*.json ./
+COPY prisma ./prisma/
+
+RUN npm ci --only=production
+
+# Copiar Prisma Client gerado e código compilado
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/prisma ./prisma
+
+# Expor porta
+EXPOSE 3001
+
+# Variáveis de ambiente (podem ser sobrescritas)
+ENV NODE_ENV=production
+ENV PORT=3001
+
+# Comando para iniciar o servidor
+CMD ["node", "dist/server/index.js"]
+

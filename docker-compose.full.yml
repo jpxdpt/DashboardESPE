@@ -1,0 +1,52 @@
+version: '3.8'
+
+# Stack completa para Portainer - Backend + Frontend
+# Use este ficheiro se quiser criar uma única stack com ambos os serviços
+
+services:
+  backend:
+    image: ghcr.io/SEU_USUARIO/SEU_REPO/backend:latest
+    container_name: dashboard-backend
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - VITE_API_URL=${VITE_API_URL:-http://localhost:3001}
+      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost}
+    networks:
+      - dashboard-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/api/alerts', (r) => {process.exit(r.statusCode === 401 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  frontend:
+    image: ghcr.io/SEU_USUARIO/SEU_REPO/frontend:latest
+    container_name: dashboard-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    environment:
+      - NGINX_HOST=_
+      - NGINX_PORT=80
+    depends_on:
+      - backend
+    networks:
+      - dashboard-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  dashboard-network:
+    driver: bridge
+
