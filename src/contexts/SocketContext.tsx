@@ -14,12 +14,11 @@ export function SocketProvider({ children }: { children: ReactNode }) {
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    // Use relative path in production (Nginx proxy), absolute URL in development
-    const backendUrl = import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.startsWith('http')
+    // Use relative path when VITE_API_URL is not set or empty (Nginx proxy handles it)
+    // Otherwise use the provided VITE_API_URL
+    const backendUrl = import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim() !== ''
       ? import.meta.env.VITE_API_URL
-      : import.meta.env.MODE === 'production'
-        ? '' // Use relative path - Nginx will proxy to backend
-        : 'http://localhost:3001';
+      : ''; // Use relative path - Nginx will proxy /socket.io to backend
     const newSocket = io(backendUrl, {
       transports: ['websocket', 'polling'],
       autoConnect: true,
