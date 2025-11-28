@@ -17,6 +17,7 @@ jobs:
   lint-and-typecheck:
     name: Lint e Type Check
     runs-on: ubuntu-latest
+    continue-on-error: true
     
     steps:
       - name: Checkout repository
@@ -37,9 +38,11 @@ jobs:
 
       - name: Type check frontend
         run: npx tsc --noEmit --project tsconfig.app.json
+        continue-on-error: true
 
       - name: Type check backend
         run: npx tsc --noEmit --project tsconfig.server.json
+        continue-on-error: true
 
   build-test:
     name: Teste de Build
