@@ -83,8 +83,6 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            VITE_API_URL=http://localhost:3001
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
