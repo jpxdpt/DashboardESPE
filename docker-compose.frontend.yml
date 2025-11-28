@@ -23,5 +23,5 @@ services:
 
 networks:
   dashboard-network:
-    external: true
+    driver: bridge
 
