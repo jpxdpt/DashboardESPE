@@ -55,8 +55,9 @@ export function UserManagement() {
         employeeNumber: '',
         role: 'PROFESSOR',
       });
-    } catch (err: any) {
-      setError(err.message || 'Erro ao criar utilizador');
+    } catch (err) {
+      const error = err as Error;
+      setError(error.message || 'Erro ao criar utilizador');
     } finally {
       setLoading(false);
     }

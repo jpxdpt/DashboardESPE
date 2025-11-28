@@ -126,19 +126,17 @@ app.post('/api/auth/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Prepare data object, only include employeeNumber if it's not empty
-    interface UserCreateData {
+    const userData: {
       email: string;
       password: string;
       name: string;
-      role: string;
+      role: 'PROFESSOR' | 'SECRETARIA';
       employeeNumber?: string;
-    }
-
-    const userData: UserCreateData = {
+    } = {
       email,
       password: hashedPassword,
       name,
-      role: finalRole,
+      role: finalRole as 'PROFESSOR' | 'SECRETARIA',
     };
 
     if (employeeNumber && employeeNumber.trim() !== '') {

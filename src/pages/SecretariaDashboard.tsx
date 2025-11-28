@@ -39,7 +39,14 @@ export function SecretariaDashboard() {
   const playNotificationSound = () => {
     try {
       // Cria um contexto de áudio (com suporte para navegadores antigos)
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      interface WindowWithWebkit extends Window {
+        webkitAudioContext?: typeof AudioContext;
+      }
+      const AudioContextClass = window.AudioContext || (window as WindowWithWebkit).webkitAudioContext;
+      if (!AudioContextClass) {
+        console.warn('AudioContext not supported');
+        return;
+      }
       const audioContext = new AudioContextClass();
       
       // Função auxiliar para criar um beep mais alto e longo
