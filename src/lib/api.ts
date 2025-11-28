@@ -1,4 +1,9 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+// Use relative path in production (Nginx proxy), absolute URL in development
+const API_URL = import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.startsWith('http') 
+  ? import.meta.env.VITE_API_URL 
+  : import.meta.env.MODE === 'production' 
+    ? '' // Use relative path - Nginx will proxy to backend
+    : 'http://localhost:3001';
 
 export const api = {
   async request(endpoint: string, options: RequestInit = {}) {

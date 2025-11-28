@@ -14,8 +14,12 @@ export function SocketProvider({ children }: { children: ReactNode }) {
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    // Connect directly to backend (CORS is configured on server)
-    const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+    // Use relative path in production (Nginx proxy), absolute URL in development
+    const backendUrl = import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.startsWith('http')
+      ? import.meta.env.VITE_API_URL
+      : import.meta.env.MODE === 'production'
+        ? '' // Use relative path - Nginx will proxy to backend
+        : 'http://localhost:3001';
     const newSocket = io(backendUrl, {
       transports: ['websocket', 'polling'],
       autoConnect: true,
