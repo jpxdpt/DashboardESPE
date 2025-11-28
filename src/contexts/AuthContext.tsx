@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import type { ReactNode } from 'react';
 import { api } from '../lib/api';
 
 interface User {
@@ -37,17 +38,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
-    try {
-      const response = await api.post('/api/auth/login', { email, password });
-      console.log('Login response:', response);
-      console.log('User role from response:', response.user?.role);
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
-      setUser(response.user);
-      console.log('User set in context:', response.user);
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.post('/api/auth/login', { email, password });
+    console.log('Login response:', response);
+    console.log('User role from response:', response.user?.role);
+    localStorage.setItem('token', response.token);
+    localStorage.setItem('user', JSON.stringify(response.user));
+    setUser(response.user);
+    console.log('User set in context:', response.user);
   };
 
   const logout = () => {

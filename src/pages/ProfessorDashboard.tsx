@@ -13,7 +13,7 @@ interface Room {
 
 export function ProfessorDashboard() {
   const { user, logout } = useAuth();
-  const { socket } = useSocket();
+  const { socket: _socket } = useSocket(); // Socket disponível para uso futuro
   const [rooms, setRooms] = useState<Room[]>([]);
   const [selectedRoom, setSelectedRoom] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -51,8 +51,9 @@ export function ProfessorDashboard() {
       setShowModal(false);
       setSelectedRoom('');
       setTimeout(() => setMessage(null), 3000);
-    } catch (error: any) {
-      setMessage({ type: 'error', text: error.message || 'Erro ao enviar alerta' });
+    } catch (error) {
+      const err = error as Error;
+      setMessage({ type: 'error', text: err.message || 'Erro ao enviar alerta' });
     } finally {
       setLoading(false);
     }

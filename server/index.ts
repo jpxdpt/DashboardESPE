@@ -8,6 +8,21 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
+// Types
+interface JwtPayload {
+  id: string;
+  email: string;
+  role: string;
+}
+
+interface PrismaError extends Error {
+  code?: string;
+}
+
+interface RequestWithUser extends express.Request {
+  user?: JwtPayload;
+}
+
 // Load environment variables - try multiple approaches
 dotenv.config({ path: resolve(process.cwd(), '.env') });
 
@@ -71,11 +86,11 @@ const authenticateToken = (req: express.Request, res: express.Response, next: ex
     return res.status(401).json({ error: 'Token de autenticação necessário' });
   }
 
-  jwt.verify(token, JWT_SECRET, (err: any, user: any) => {
-    if (err) {
+  jwt.verify(token, JWT_SECRET, (err: Error | null, user: JwtPayload | undefined) => {
+    if (err || !user) {
       return res.status(403).json({ error: 'Token inválido' });
     }
-    (req as any).user = user;
+    (req as RequestWithUser).user = user;
     next();
   });
 };
@@ -134,12 +149,13 @@ app.post('/api/auth/register', async (req, res) => {
     });
 
     res.json({ message: 'Conta criada com sucesso', user });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Registration error:', error);
-    if (error.code === 'P2002') {
+    const prismaError = error as PrismaError;
+    if (prismaError.code === 'P2002') {
       return res.status(400).json({ error: 'Já existe um utilizador com este email ou número de funcionário' });
     }
-    res.status(500).json({ error: error.message || 'Erro interno do servidor' });
+    res.status(500).json({ error: prismaError.message || 'Erro interno do servidor' });
   }
 });
 
@@ -187,13 +203,14 @@ app.post('/api/auth/login', async (req, res) => {
       token,
       user: userResponse
     });
-  } catch (error: any) {
-    console.error('Login error:', error);
-    console.error('Error stack:', error?.stack);
+  } catch (error) {
+    const err = error as Error;
+    console.error('Login error:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).json({ 
       error: 'Erro interno do servidor',
-      message: error?.message || 'Unknown error',
-      details: process.env.NODE_ENV === 'development' ? error?.stack : undefined
+      message: err.message || 'Unknown error',
+      details: process.env.NODE_ENV === 'development' ? err.stack : undefined
     });
   }
 });
@@ -297,8 +314,9 @@ app.post('/api/rooms', authenticateToken, async (req, res) => {
       data: { name: name.trim(), number }
     });
     res.json(room);
-  } catch (error: any) {
-    if (error.code === 'P2002') {
+  } catch (error) {
+    const prismaError = error as PrismaError;
+    if (prismaError.code === 'P2002') {
       return res.status(400).json({ error: 'Já existe uma sala com este nome' });
     }
     console.error('Error creating room:', error);
@@ -323,8 +341,9 @@ app.put('/api/rooms/:id', authenticateToken, async (req, res) => {
       data: { name: name.trim(), number }
     });
     res.json(room);
-  } catch (error: any) {
-    if (error.code === 'P2002') {
+  } catch (error) {
+    const prismaError = error as PrismaError;
+    if (prismaError.code === 'P2002') {
       return res.status(400).json({ error: 'Já existe uma sala com este nome' });
     }
     console.error('Error updating room:', error);
@@ -394,8 +413,9 @@ app.post('/api/users', authenticateToken, async (req, res) => {
       }
     });
     res.json(user);
-  } catch (error: any) {
-    if (error.code === 'P2002') {
+  } catch (error) {
+    const prismaError = error as PrismaError;
+    if (prismaError.code === 'P2002') {
       return res.status(400).json({ error: 'Já existe um utilizador com este email ou número de funcionário' });
     }
     console.error('Error creating user:', error);
