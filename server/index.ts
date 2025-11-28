@@ -86,10 +86,11 @@ const authenticateToken = (req: express.Request, res: express.Response, next: ex
     return res.status(401).json({ error: 'Token de autenticação necessário' });
   }
 
-  jwt.verify(token, JWT_SECRET, (err: Error | null, user: JwtPayload | undefined) => {
-    if (err || !user) {
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    if (err || !decoded) {
       return res.status(403).json({ error: 'Token inválido' });
     }
+    const user = decoded as JwtPayload;
     (req as RequestWithUser).user = user;
     next();
   });
@@ -125,7 +126,15 @@ app.post('/api/auth/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Prepare data object, only include employeeNumber if it's not empty
-    const userData: any = {
+    interface UserCreateData {
+      email: string;
+      password: string;
+      name: string;
+      role: string;
+      employeeNumber?: string;
+    }
+
+    const userData: UserCreateData = {
       email,
       password: hashedPassword,
       name,

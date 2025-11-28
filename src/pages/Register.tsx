@@ -40,8 +40,9 @@ export function Register() {
         role: formData.role,
       });
       navigate('/login', { state: { message: 'Conta criada com sucesso! Pode agora fazer login.' } });
-    } catch (err: any) {
-      setError(err.message || 'Erro ao criar conta');
+    } catch (err) {
+      const error = err as Error;
+      setError(error.message || 'Erro ao criar conta');
     } finally {
       setLoading(false);
     }

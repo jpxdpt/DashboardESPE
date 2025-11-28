@@ -13,7 +13,8 @@ interface Room {
 
 export function ProfessorDashboard() {
   const { user, logout } = useAuth();
-  const { socket: _socket } = useSocket(); // Socket disponível para uso futuro
+  // Socket disponível via useSocket() se necessário no futuro
+  useSocket();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [selectedRoom, setSelectedRoom] = useState('');
   const [showModal, setShowModal] = useState(false);

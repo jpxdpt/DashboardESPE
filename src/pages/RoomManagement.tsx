@@ -48,8 +48,9 @@ export function RoomManagement() {
       setShowForm(false);
       setEditingRoom(null);
       setFormData({ name: '' });
-    } catch (err: any) {
-      setError(err.message || 'Erro ao guardar sala');
+    } catch (err) {
+      const error = err as Error;
+      setError(error.message || 'Erro ao guardar sala');
     } finally {
       setLoading(false);
     }
@@ -67,8 +68,9 @@ export function RoomManagement() {
     try {
       await api.delete(`/api/rooms/${id}`);
       await loadRooms();
-    } catch (err: any) {
-      alert(err.message || 'Erro ao eliminar sala');
+    } catch (err) {
+      const error = err as Error;
+      alert(error.message || 'Erro ao eliminar sala');
     }
   };
 

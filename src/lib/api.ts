@@ -29,14 +29,14 @@ export const api = {
     return this.request(endpoint, { method: 'GET' });
   },
 
-  post(endpoint: string, data: any) {
+  post(endpoint: string, data: unknown) {
     return this.request(endpoint, {
       method: 'POST',
       body: JSON.stringify(data),
     });
   },
 
-  patch(endpoint: string, data: any) {
+  patch(endpoint: string, data: unknown) {
     return this.request(endpoint, {
       method: 'PATCH',
       body: JSON.stringify(data),
