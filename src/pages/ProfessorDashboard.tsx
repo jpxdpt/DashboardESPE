@@ -97,7 +97,7 @@ export function ProfessorDashboard() {
 
           <div className="bg-white shadow rounded-lg p-6">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Enviar Alerta de Ordem de Saída
+              Enviar Alerta de Pedido de assistência
             </h2>
             <p className="text-gray-600 mb-6">
               Clique no botão abaixo para enviar um alerta à secretaria quando precisar de autorizar

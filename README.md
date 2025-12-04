@@ -1,6 +1,6 @@
 # Dashboard Escola - Sistema de Alertas
 
-Sistema de dashboard para gestão de alertas de ordem de saída entre professores e secretaria.
+Sistema de dashboard para gestão de alertas de Pedido de assistência entre professores e secretaria.
 
 ## Funcionalidades
 

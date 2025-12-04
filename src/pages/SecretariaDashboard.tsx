@@ -234,7 +234,7 @@ export function SecretariaDashboard() {
                     <div>
                       <div className="flex items-center space-x-2 mb-2">
                         <h3 className="text-lg font-semibold text-gray-900">
-                          Alerta de Ordem de Saída
+                          Alerta de Pedido de assistência
                         </h3>
                         {alert.status === 'PENDING' && (
                           <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded">
